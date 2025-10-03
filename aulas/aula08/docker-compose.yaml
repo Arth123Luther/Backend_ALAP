@@ -1,0 +1,8 @@
+services:
+  db:
+    image: mongodb/mongodb-atlas-local
+    container_name: meubanco
+    ports:
+      - "27017:27017"
+    tty: true
+    stdin_open: true
