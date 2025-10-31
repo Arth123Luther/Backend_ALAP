@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 function gerarToken(payload) {
     try {
+        const expiresIn = 60;
         const token = jwt.sign(payload, process.env.JWT_SECRET);
         return token;
     } catch(err) {
@@ -12,7 +13,8 @@ function gerarToken(payload) {
 function verificarToken(req, res, next) {
     try {
         const { authorization } = req.headers;
-        const payload = jwt.verify(authorization, process.env.JWT_SECRET);
+        const token = authorization.split(" ")[1];
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
         req.payload = payload;
         return next();
     } catch(err){
