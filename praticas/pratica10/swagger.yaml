@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: Minha API REST
+  version: 0.1
+servers:
+  - url: http://localhost:3000/
+tags:
+  - name: usuarios
+paths:
+  /usuarios:
+    post:
+      tags:
+        - usuarios
+      description: Cria um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - senha
+              properties:
+                email:
+                  type: string
+                senha:
+                  type: string
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '422':
+          description: Dados obrigatórios ausentes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+  /usuarios/login:
+    post:
+      tags:
+        - usuarios
+      description: Autentica um usuário com email e senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - usuario
+                - senha
+              properties:
+                usuario:
+                  type: string
+                senha:
+                  type: string
+      responses:
+        '200':
+          description: Autenticação bem-sucedida — token jwt retornado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+  /usuarios/renovar:
+    post:
+      tags:
+        - usuarios
+      security:
+        - JWTAuth: []
+      description: Renova o JWT de autenticação
+      responses:
+        '200':
+          description: Token renovado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Token ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+  /usuarios/{id}:
+    delete:
+      tags:
+        - usuarios
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: Remove um usuário pelo _id
+      responses:
+        '204':
+          description: Sucesso — sem conteúdo
+        '401':
+          description: Token ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensagem'
+components:
+  securitySchemes:
+    JWTAuth:
+      type: apiKey
+      name: authorization
+      in: header
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+    Mensagem:
+      type: object
+      properties:
+        msg:
+          type: string
